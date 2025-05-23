@@ -1,3 +1,7 @@
+# JankyBorders: Animated Gradients with Colour Interpolation
+Fork of JankyBorders adding animated colour transitions with smooth interpolation between gradient colours.
+
+
 # JankyBorders
 
 <img align="right" width="50%" src="images/screenshot.png" alt="Screenshot">
