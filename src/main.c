@@ -8,7 +8,9 @@
 #include "misc/connection.h"
 #include "misc/ax.h"
 #include "misc/yabai.h"
+#include "gradient_animation.h" // Added for gradient animation
 #include <stdio.h>
+#include <stdlib.h> // For atexit
 
 #define VERSION_OPT_LONG "--version"
 #define VERSION_OPT_SHRT "-v"
@@ -24,6 +26,12 @@ pid_t g_pid;
 mach_port_t g_server_port;
 struct table g_windows;
 struct mach_server g_mach_server;
+
+// --- Added for Gradient Animation ---
+struct animation g_gradient_animator;
+struct gradient_animation_state g_gradient_anim_state;
+// --- End Added for Gradient Animation ---
+
 struct settings g_settings = { .enabled = true,
                                .active_window = { .stype = COLOR_STYLE_SOLID,
                                                   .color = 0xffe1e3e4 },
@@ -39,7 +47,29 @@ struct settings g_settings = { .enabled = true,
                                .border_order = BORDER_ORDER_BELOW,
                                .ax_focus = false,
                                .blacklist_enabled = false,
-                               .whitelist_enabled = false                    };
+                               .whitelist_enabled = false,
+                               // --- Added for Gradient Animation ---
+                               .animated_gradient_enabled = false,
+                               .parsed_gradient_colors = NULL,
+                               .num_parsed_gradient_colors = 0,
+                               .animated_gradient_steps = 50,
+                               .animated_gradient_duration_sec = 20.0f
+                               // --- End Added for Gradient Animation ---
+                               };
+
+// --- Added for Gradient Animation ---
+static void cleanup_gradient_animation(void) {
+    // This function will be called upon normal program termination
+    gradient_animation_stop(&g_gradient_animator);
+    
+    // Free the parsed_gradient_colors if it was allocated
+    if (g_settings.parsed_gradient_colors) {
+        free(g_settings.parsed_gradient_colors);
+        g_settings.parsed_gradient_colors = NULL;
+        g_settings.num_parsed_gradient_colors = 0;
+    }
+}
+// --- End Added for Gradient Animation ---
 
 static TABLE_HASH_FUNC(hash_windows) {
   return *(uint32_t *) key;
@@ -214,6 +244,15 @@ int main(int argc, char** argv) {
 
   mach_server_begin(&g_mach_server, message_handler);
   if (!update_mask) execute_config_file("borders", "bordersrc");
+
+  // --- Added for Gradient Animation ---
+  // Register cleanup function to stop animation and free colors on exit
+  atexit(cleanup_gradient_animation);
+
+  // Start gradient animation if enabled in settings
+  // This is after all settings are loaded (command line + config file)
+  gradient_animation_init_and_start(&g_gradient_animator, &g_gradient_anim_state, &g_settings);
+  // --- End Added for Gradient Animation ---
 
   #ifdef _YABAI_INTEGRATION
   yabai_register_mach_port(&g_windows);

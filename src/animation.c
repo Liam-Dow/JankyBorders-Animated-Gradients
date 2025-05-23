@@ -27,7 +27,9 @@ void animation_stop(struct animation* animation) {
     CVDisplayLinkRelease(animation->link);
     animation->link = NULL;
   }
-  if (animation->context) free(animation->context);
+  // The context is managed by the caller of animation_start.
+  // animation_start does not allocate it, so animation_stop should not free it.
+  // if (animation->context) free(animation->context); // Original line - REMOVED
   animation->context = NULL;
 }
 #pragma clang diagnostic pop

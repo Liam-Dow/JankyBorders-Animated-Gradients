@@ -45,6 +45,15 @@ struct settings {
 
   bool whitelist_enabled;
   struct table whitelist;
+
+  // --- Added for Gradient Animation ---
+  bool animated_gradient_enabled;
+  uint32_t* parsed_gradient_colors; // Array of parsed 0xAARRGGBB colors
+  int num_parsed_gradient_colors;
+  int animated_gradient_steps;
+  float animated_gradient_duration_sec;
+  // struct table animated_gradient_color_list; // Optional: if raw strings are needed for other purposes
+  // --- End Added for Gradient Animation ---
 };
 
 struct event_buffer {
