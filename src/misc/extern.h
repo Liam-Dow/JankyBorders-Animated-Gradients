@@ -37,7 +37,7 @@ extern CGError SLSSetWindowTransform(int cid, uint32_t wid, CGAffineTransform tr
 
 extern CGError SLSWindowSetShadowProperties(uint32_t wid, CFDictionaryRef properties);
 extern CGError SLSGetWindowLevel(int cid, uint32_t wid, int64_t* level_out);
-extern uint64_t SLSGetWindowSubLevel(int cid, uint32_t wid);
+extern int32_t SLSGetWindowSubLevel(int cid, uint32_t wid);
 extern CGError SLSMoveWindowsToManagedSpace(int cid, CFArrayRef window_list, uint64_t sid);
 extern CGContextRef SLWindowContextCreate(int cid, uint32_t wid, CFDictionaryRef options);
 
@@ -72,6 +72,10 @@ extern uint32_t SLSWindowIteratorGetWindowID(CFTypeRef iterator);
 extern uint64_t SLSWindowIteratorGetTags(CFTypeRef iterator);
 extern uint64_t SLSWindowIteratorGetAttributes(CFTypeRef iterator);
 extern int SLSWindowIteratorGetLevel(CFTypeRef iterator);
+
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
+extern CFArrayRef SLSWindowIteratorGetCornerRadii(CFTypeRef iterator);
+#endif
 
 extern CFArrayRef SLSCopyManagedDisplays(int cid);
 extern CFArrayRef SLSCopyManagedDisplaySpaces(int cid);

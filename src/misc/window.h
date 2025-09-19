@@ -130,7 +130,13 @@ static inline uint64_t window_space_id(int cid, uint32_t wid) {
 }
 
 extern mach_port_t g_server_port;
-static inline int32_t window_sub_level(uint32_t wid) {
+static inline int32_t window_sub_level(int cid, uint32_t wid) {
+  mach_msg_id_t request = 0x73c3;
+  if (__builtin_available(macOS 26.0, *)) request = 0x76e3;
+
+  mach_msg_id_t response = 0x7427;
+  if (__builtin_available(macOS 26.0, *)) response = 0x7747;
+
   #pragma pack(push,2)
   struct {
     struct {
@@ -157,7 +163,7 @@ static inline int32_t window_sub_level(uint32_t wid) {
                                                  0,
                                                  MACH_MSGH_BITS_REMOTE_MASK  );
 
-  msg.info.header.msgh_id = 0x73c3;
+  msg.info.header.msgh_id = request;
   msg.payload.wid = wid;
 
   kern_return_t error = mach_msg(&msg.info.header,
@@ -178,10 +184,7 @@ static inline int32_t window_sub_level(uint32_t wid) {
     return 0;
   }
 
-  if (msg.info.header.msgh_id != 0x7427
-     || msg.info.header.msgh_size != 0x28
-     || msg.info.header.msgh_remote_port != 0
-     || msg.payload.wid != 0                 ) {
+  if (msg.info.header.msgh_id != response) {
     printf("SubLevel: Invalid message received\n");
     mach_msg_destroy(&msg.info.header);
     return 0;

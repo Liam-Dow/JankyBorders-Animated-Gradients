@@ -9,12 +9,16 @@
 #define BORDER_ORDER_ABOVE 1
 #define BORDER_ORDER_BELOW -1
 #define BORDER_STYLE_ROUND  'r'
+#define BORDER_STYLE_ROUND_UNIFORM 'u'
 #define BORDER_STYLE_SQUARE 's'
 #define BORDER_PADDING 8.0
 #define BORDER_TSMN 3.27f
+
+#if __MAC_OS_X_VERSION_MAX_ALLOWED >= 260000
+#define BORDER_TSMW 52.f
+#else
 #define BORDER_TSMW 8.f
-#define BORDER_RADIUS 9.f
-#define BORDER_INNER_RADIUS 10.f
+#endif
 
 struct color_style {
   enum { COLOR_STYLE_GRADIENT, COLOR_STYLE_SOLID, COLOR_STYLE_GLOW } stype;
@@ -30,6 +34,7 @@ struct settings {
 
   struct color_style active_window;
   struct color_style inactive_window;
+  struct color_style corner_mask;
   struct color_style background;
 
   float border_width;
@@ -74,6 +79,9 @@ struct border {
   uint64_t sid;
   uint32_t wid;
   uint32_t target_wid;
+
+  float radius;
+  float inner_radius;
 
   CGPoint origin;
   CGRect frame;
